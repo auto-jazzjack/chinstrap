@@ -6,21 +6,24 @@ import (
 )
 
 type MonoJust[T any] struct {
-	Mono  Mono[T]
 	value T
 }
 
 type MonoJustImpl[T any] interface {
 	Fusable
-	core.CorePublisher[T]
-	//SubscribeCore(subscriber core.CoreSubscriber[T])
-	//Subscribe(s reactive.Subscriber[T])
+	Mono[T]
 }
 
-func NewMonoJust[T any](t T) *MonoJust[T] {
-	return &MonoJust[T]{
+func NewMonoJust[T any](t T) *Wrapper[T] {
+	v := &MonoJust[T]{
 		value: t,
 	}
+	return NewWrapper[T](v)
+}
+
+func (m *MonoJust[T]) GetWrapper() *Wrapper[T] {
+	//return parent? actually it is just wrapper
+	return nil
 }
 
 func (m *MonoJust[T]) SubscribeCore(actual core.CoreSubscriber[T]) {
