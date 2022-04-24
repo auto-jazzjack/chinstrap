@@ -13,7 +13,7 @@ type WrapperImpl[T any] interface {
 	Mono[T]
 }
 
-func NewWrapper[T any](m Mono[T]) *Wrapper[T] {
+func NewWrapper[T any](m reactive.Publisher[T]) *Wrapper[T] {
 	return &Wrapper[T]{
 		internal: m,
 	}

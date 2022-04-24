@@ -10,8 +10,7 @@ type MonoJust[T any] struct {
 }
 
 type MonoJustImpl[T any] interface {
-	Fusable
-	Mono[T]
+	core.CorePublisher[T]
 }
 
 func NewMonoJust[T any](t T) *Wrapper[T] {
@@ -19,11 +18,6 @@ func NewMonoJust[T any](t T) *Wrapper[T] {
 		value: t,
 	}
 	return NewWrapper[T](v)
-}
-
-func (m *MonoJust[T]) GetWrapper() *Wrapper[T] {
-	//return parent? actually it is just wrapper
-	return nil
 }
 
 func (m *MonoJust[T]) SubscribeCore(actual core.CoreSubscriber[T]) {
