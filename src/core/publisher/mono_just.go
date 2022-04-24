@@ -6,6 +6,7 @@ import (
 )
 
 type MonoJust[T any] struct {
+	Mono  Mono[T]
 	value T
 }
 
@@ -16,7 +17,7 @@ type MonoJustImpl[T any] interface {
 	//Subscribe(s reactive.Subscriber[T])
 }
 
-func newMonoJust[T any](t T) *MonoJust[T] {
+func NewMonoJust[T any](t T) *MonoJust[T] {
 	return &MonoJust[T]{
 		value: t,
 	}
