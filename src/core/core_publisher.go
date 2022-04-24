@@ -4,6 +4,6 @@ package core
 import "chinstrap/core/reactive"
 
 type CorePublisher[T any] interface {
+	reactive.Publisher[T]
 	SubscribeCore(subscriber CoreSubscriber[T])
-	Subscribe(s reactive.Subscriber[T])
 }
