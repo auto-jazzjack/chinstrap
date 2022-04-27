@@ -18,7 +18,6 @@ func Just[V any](v V) Mono[V] {
 
 }
 
-func (m *Mono[T]) Map(consumer func(T, T) T) Mono[T] {
-
+func (m Mono[T]) Map(consumer func(T, T) T) Mono[T] {
 	return Mono[T]{}
 }

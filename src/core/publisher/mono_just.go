@@ -5,16 +5,16 @@ import (
 	"chinstrap/core/reactive"
 )
 
-type MonoJust[T any] struct {
+type MonoJustImpl[T any] struct {
 	value T
 }
 
-type MonoJustImpl[T any] interface {
-	core.CorePublisher[T]
+/* type MonoJust[T any] interface {
+	reactive.Subscriber[T]
 }
-
+*/
 func NewMonoJust[T any](t T) Mono[T] {
-	v := &MonoJust[T]{
+	v := &MonoJustImpl[T]{
 		value: t,
 	}
 	return Mono[T]{
@@ -22,10 +22,12 @@ func NewMonoJust[T any](t T) Mono[T] {
 	}
 }
 
-func (m *MonoJust[T]) SubscribeCore(actual core.CoreSubscriber[T]) {
+func (m *MonoJustImpl[T]) SubscribeCore(actual core.CoreSubscriber[T]) {
 	actual.OnSubscribe(NewScalarSubscription(actual, m.value))
 }
 
-func (m *MonoJust[T]) Subscribe(s reactive.Subscriber[T]) {
-
+func (m *MonoJustImpl[T]) Subscribe(s reactive.Subscriber[T]) {
+	pub := core.CorePublisher[T](m)
+	sub := s.(core.CoreSubscriber[T])
+	pub.Subscribe(sub)
 }
