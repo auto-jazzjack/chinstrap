@@ -13,11 +13,13 @@ type MonoJustImpl[T any] interface {
 	core.CorePublisher[T]
 }
 
-func NewMonoJust[T any](t T) *Wrapper[T] {
+func NewMonoJust[T any](t T) Mono[T] {
 	v := &MonoJust[T]{
 		value: t,
 	}
-	return NewWrapper[T](v)
+	return Mono[T]{
+		actual: v,
+	}
 }
 
 func (m *MonoJust[T]) SubscribeCore(actual core.CoreSubscriber[T]) {
