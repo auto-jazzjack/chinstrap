@@ -5,46 +5,47 @@ import (
 	"chinstrap/core/reactive"
 )
 
-type ScalarSubscription[T any] interface {
+/* type ScalarSubscription[T any] interface {
 	core.CoreSubscriber[T]
 	reactive.Subscription
 	//SynchronousSubscription[T]
-}
+} */
 type ScalarSubscriptionImpl[T any] struct {
 	actual core.CoreSubscriber[T]
 	value  T
 	sub    reactive.Subscription
 }
 
-func NewScalarSubscription[T any](actual core.CoreSubscriber[T], value T) ScalarSubscriptionImpl[T] {
-	return ScalarSubscriptionImpl[T]{
+func NewScalarSubscription[T any](actual core.CoreSubscriber[T], value T) reactive.Subscription {
+	return &ScalarSubscriptionImpl[T]{
 		actual: actual,
 		value:  value,
 	}
 }
 
-func (s ScalarSubscriptionImpl[T]) Request(n int64) {
+func (s *ScalarSubscriptionImpl[T]) Request(n int64) {
 	s.sub.Request(n)
+	s.OnComplete()
 }
-func (s ScalarSubscriptionImpl[T]) Cancel() {
+func (s *ScalarSubscriptionImpl[T]) Cancel() {
 	s.sub.Cancel()
 }
-func (s ScalarSubscriptionImpl[T]) OnNext(t T) error {
+func (s *ScalarSubscriptionImpl[T]) OnNext(t T) error {
 	return s.actual.OnNext(s.value)
 }
 
-func (s ScalarSubscriptionImpl[T]) OnError(t error) {
+func (s *ScalarSubscriptionImpl[T]) OnError(t error) {
 	s.actual.OnError(t)
 }
 
-func (s ScalarSubscriptionImpl[T]) OnComplete() {
+func (s *ScalarSubscriptionImpl[T]) OnComplete() {
 	//s.OnComplete()
 }
 
 func (s *ScalarSubscriptionImpl[T]) OnSubscribe(sb reactive.Subscription) {
 	s.sub = sb
-
 }
-func (s ScalarSubscriptionImpl[T]) CurrentContext() {
+
+func (s *ScalarSubscriptionImpl[T]) CurrentContext() {
 	//do nothing
 }

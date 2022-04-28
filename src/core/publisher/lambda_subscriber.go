@@ -7,14 +7,11 @@ import (
 )
 
 type LamdaImpl[T any] struct {
-	consumer             func(T) error
-	errorConsumer        func(error)
-	completeConsumer     func()
-	subscriptionConsumer func(reactive.Subscription)
-	sub                  reactive.Subscription
-}
-
-type Lamda interface {
+	consumer         func(T) error
+	errorConsumer    func(error)
+	completeConsumer func()
+	//subscriptionConsumer func(reactive.Subscription)
+	sub reactive.Subscription
 }
 
 func NewLamdaSubscriber[T any](consumer func(T) error, errorConsumer func(error), completeConsumer func()) core.CoreSubscriber[T] {
