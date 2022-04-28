@@ -27,7 +27,5 @@ func (m *MonoJustImpl[T]) SubscribeCore(actual core.CoreSubscriber[T]) {
 }
 
 func (m *MonoJustImpl[T]) Subscribe(s reactive.Subscriber[T]) {
-	pub := core.CorePublisher[T](m)
-	sub := s.(core.CoreSubscriber[T])
-	pub.SubscribeCore(sub)
+	Subscribe0(core.CorePublisher[T](m), s)
 }

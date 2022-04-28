@@ -25,9 +25,7 @@ func (m *MonoMap[I, O]) SubscribeCore(actual core.CoreSubscriber[O]) {
 }
 
 func (m *MonoMap[I, O]) Subscribe(s reactive.Subscriber[O]) {
-	pub := core.CorePublisher[O](m)
-	sub := s.(core.CoreSubscriber[O])
-	pub.Subscribe(sub)
+	Subscribe0(core.CorePublisher[O](m), s)
 }
 
 type MonoMapSubscriber[I any, O any] struct {

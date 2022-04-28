@@ -43,8 +43,6 @@ func (l *LamdaImpl[T]) OnNext(t T) error {
 		}
 	}
 	return nil
-	//l.sub.
-	//l.actual.OnNext(t)
 }
 
 func (l *LamdaImpl[T]) OnError(t error) {
@@ -61,6 +59,7 @@ func (l *LamdaImpl[T]) OnComplete() {
 func (l *LamdaImpl[T]) OnSubscribe(sb reactive.Subscription) {
 	l.sub = sb
 	l.sub.Request(math.MaxInt64)
+
 }
 func (l *LamdaImpl[T]) CurrentContext() {
 	//do nothing

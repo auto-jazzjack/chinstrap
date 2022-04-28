@@ -24,12 +24,14 @@ func NewScalarSubscription[T any](actual core.CoreSubscriber[T], value T) reacti
 }
 
 func (s *ScalarSubscriptionImpl[T]) Request(n int64) {
-	s.sub.Request(n)
+	s.actual.OnNext(s.value)
 	s.OnComplete()
 }
+
 func (s *ScalarSubscriptionImpl[T]) Cancel() {
 	s.sub.Cancel()
 }
+
 func (s *ScalarSubscriptionImpl[T]) OnNext(t T) error {
 	return s.actual.OnNext(s.value)
 }
@@ -39,10 +41,11 @@ func (s *ScalarSubscriptionImpl[T]) OnError(t error) {
 }
 
 func (s *ScalarSubscriptionImpl[T]) OnComplete() {
-	//s.OnComplete()
+	s.actual.OnComplete()
 }
 
 func (s *ScalarSubscriptionImpl[T]) OnSubscribe(sb reactive.Subscription) {
+	s.actual.OnSubscribe(s)
 	s.sub = sb
 }
 
