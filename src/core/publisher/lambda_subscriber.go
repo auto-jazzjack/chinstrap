@@ -3,6 +3,7 @@ package publisher
 import (
 	"chinstrap/core"
 	"chinstrap/core/reactive"
+	"math"
 )
 
 type LamdaImpl[T any] struct {
@@ -62,8 +63,7 @@ func (l *LamdaImpl[T]) OnComplete() {
 
 func (l *LamdaImpl[T]) OnSubscribe(sb reactive.Subscription) {
 	l.sub = sb
-	//l.sub = sb
-
+	l.sub.Request(math.MaxInt64)
 }
 func (l *LamdaImpl[T]) CurrentContext() {
 	//do nothing
