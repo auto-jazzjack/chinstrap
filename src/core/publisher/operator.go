@@ -29,8 +29,8 @@ func (s ScalarSubscriptionImpl[T]) Request(n int64) {
 func (s ScalarSubscriptionImpl[T]) Cancel() {
 	s.sub.Cancel()
 }
-func (s ScalarSubscriptionImpl[T]) OnNext(t T) {
-	s.actual.OnNext(t)
+func (s ScalarSubscriptionImpl[T]) OnNext(t T) error {
+	return s.actual.OnNext(t)
 }
 
 func (s ScalarSubscriptionImpl[T]) OnError(t error) {

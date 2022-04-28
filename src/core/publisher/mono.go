@@ -21,3 +21,11 @@ func Just[V any](v V) Mono[V] {
 func (m Mono[T]) Map(consumer func(T, T) T) Mono[T] {
 	return Mono[T]{}
 }
+
+func (m Mono[T]) Subscribe() {
+	m.actual.SubscribeCore(NewLamdaSubscriber[T](nil, nil, nil))
+}
+
+func (m Mono[T]) SubscribeCore(subscriber core.CoreSubscriber[T]) {
+
+}

@@ -50,9 +50,9 @@ func (mm MonoMapSubscriber[I, O]) OnSubscribe(s reactive.Subscription) {
 func (mm MonoMapSubscriber[I, O]) OnError(t error) {
 	mm.src.OnError(t)
 }
-func (mm MonoMapSubscriber[I, O]) OnNext(t I) {
+func (mm MonoMapSubscriber[I, O]) OnNext(t I) error {
 	res := mm.mapper(t)
-	mm.src.OnNext(res)
+	return mm.src.OnNext(res)
 }
 
 func (mm MonoMapSubscriber[I, O]) OnComplete() {
