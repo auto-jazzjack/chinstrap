@@ -30,7 +30,7 @@ func (s ScalarSubscriptionImpl[T]) Cancel() {
 	s.sub.Cancel()
 }
 func (s ScalarSubscriptionImpl[T]) OnNext(t T) error {
-	return s.actual.OnNext(t)
+	return s.actual.OnNext(s.value)
 }
 
 func (s ScalarSubscriptionImpl[T]) OnError(t error) {
@@ -38,7 +38,7 @@ func (s ScalarSubscriptionImpl[T]) OnError(t error) {
 }
 
 func (s ScalarSubscriptionImpl[T]) OnComplete() {
-	s.OnComplete()
+	//s.OnComplete()
 }
 
 func (s *ScalarSubscriptionImpl[T]) OnSubscribe(sb reactive.Subscription) {
