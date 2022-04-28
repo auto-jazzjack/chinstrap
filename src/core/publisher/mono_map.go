@@ -25,9 +25,7 @@ func (m *MonoMap[I, O]) SubscribeCore(actual core.CoreSubscriber[O]) {
 }
 
 func (m *MonoMap[I, O]) Subscribe(s reactive.Subscriber[O]) {
-	pub := core.CorePublisher[O](m)
-	sub := s.(core.CoreSubscriber[O])
-	pub.Subscribe(sub)
+	Subscribe0(core.CorePublisher[O](m), s)
 }
 
 type MonoMapSubscriber[I any, O any] struct {
@@ -37,31 +35,35 @@ type MonoMapSubscriber[I any, O any] struct {
 }
 
 func newMonoMapSubscriber[I any, O any](m core.CoreSubscriber[O], mapper func(I) O) reactive.Subscriber[I] {
-	return MonoMapSubscriber[I, O]{
+	return &MonoMapSubscriber[I, O]{
 		mapper: mapper,
 		src:    m,
 	}
 }
 
-func (mm MonoMapSubscriber[I, O]) OnSubscribe(s reactive.Subscription) {
+func (mm *MonoMapSubscriber[I, O]) OnSubscribe(s reactive.Subscription) {
 	mm.sub = s
 	mm.src.OnSubscribe(mm)
 }
-func (mm MonoMapSubscriber[I, O]) OnError(t error) {
+func (mm *MonoMapSubscriber[I, O]) OnError(t error) {
 	mm.src.OnError(t)
 }
-func (mm MonoMapSubscriber[I, O]) OnNext(t I) {
+func (mm *MonoMapSubscriber[I, O]) OnNext(t I) error {
 	res := mm.mapper(t)
-	mm.src.OnNext(res)
+	return mm.src.OnNext(res)
 }
 
-func (mm MonoMapSubscriber[I, O]) OnComplete() {
+func (mm *MonoMapSubscriber[I, O]) OnComplete() {
 	mm.src.OnComplete()
 }
 
-func (mm MonoMapSubscriber[I, O]) Request(n int64) {
+func (mm *MonoMapSubscriber[I, O]) Request(n int64) {
 	mm.sub.Request(n)
 }
-func (mm MonoMapSubscriber[I, O]) Cancel() {
+func (mm *MonoMapSubscriber[I, O]) Cancel() {
 	mm.sub.Cancel()
+}
+
+func (mm *MonoMapSubscriber[I, O]) CurrentContext() {
+
 }

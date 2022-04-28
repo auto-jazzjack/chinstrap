@@ -9,8 +9,9 @@ func main() {
 	println("hello world")
 
 	Mono.Just("11").
-		Map(func(s1, s2 string) string {
+		Map(func(s1 string) string {
 			fmt.Printf("Hello")
 			return "111"
-		})
+		}).
+		Subscribe()
 }
