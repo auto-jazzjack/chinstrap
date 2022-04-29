@@ -19,6 +19,9 @@ func main() {
 		Map(func(i int) int {
 			return i + i
 		}).
+		Filter(func(i int) bool {
+			return i > 10000
+		}).
 		Block()
 	fmt.Println(v)
 
