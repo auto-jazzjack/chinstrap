@@ -19,16 +19,28 @@ func Just[V any](v V) Mono[V] {
 
 }
 
+func (m Mono[T]) Block() T {
+	b := NewBlockingMonoSubscriber[T]()
+	v := reactive.Subscriber[T](b)
+	m.actual.Subscribe(v)
+	return b.BlockingGet()
+}
+
 func (m Mono[T]) Map(consumer func(T) T) Mono[T] {
 	return NewMonoMap(m, consumer)
 }
 
-func (m Mono[T]) Subscribe() {
+func (m Mono[T]) Subscribe0() {
 	m.actual.Subscribe(NewLamdaSubscriber[T](nil, nil, nil))
 }
 
-func (m Mono[T]) SubscribeCore(subscriber core.CoreSubscriber[T]) {
-	panic("shold be implmented")
+func (m Mono[T]) Subscribe(s reactive.Subscriber[T]) {
+	pub := core.CorePublisher[T](m)
+	Subscribe0(pub, s)
+}
+
+func (m Mono[T]) SubscribeCore(sub core.CoreSubscriber[T]) {
+	panic("should not reached")
 }
 
 func Subscribe0[T any](m core.CorePublisher[T], s reactive.Subscriber[T]) {
