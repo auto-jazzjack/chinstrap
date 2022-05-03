@@ -30,7 +30,7 @@ func NewMonoZip2[I0 any, I1 any, O any](source1 Mono[I0], source2 Mono[I1], zipp
 
 func (m *MonoZip[O]) SubscribeCore(actual core.CoreSubscriber[O]) {
 	for _, v := range m.monos {
-		v.Subscribe(newMonoZipSubscriber(actual, m, m.zipper))
+		v.Subscribe(newMonoZipSubscriber(actual, m))
 	}
 	//m.mono.actual.Subscribe()
 }
@@ -50,9 +50,8 @@ type MonoZipSubscriber[O any] struct {
 	sub       reactive.Subscription
 }
 
-func newMonoZipSubscriber[O any](mm core.CoreSubscriber[O], mz *MonoZip[O], zipper func(...any) O) reactive.Subscriber[O] {
-	return &MonoZipSubscriber[O]{
-		zipper:    zipper,
+func newMonoZipSubscriber(mm core.CoreSubscriber[any], mz *MonoZip[any]) reactive.Subscriber[any] {
+	return &MonoZipSubscriber[any]{
 		src:       mm,
 		parentZip: mz,
 	}
@@ -65,7 +64,7 @@ func (mm *MonoZipSubscriber[O]) OnSubscribe(s reactive.Subscription) {
 func (mm *MonoZipSubscriber[O]) OnError(t error) {
 	mm.src.OnError(t)
 }
-func (mm *MonoZipSubscriber[O]) OnNext(t O) error {
+func (mm *MonoZipSubscriber[O]) OnNext(t any) error {
 	mm.parentZip.signal()
 	return nil
 }
@@ -81,6 +80,6 @@ func (mm *MonoZipSubscriber[O]) Cancel() {
 	mm.sub.Cancel()
 }
 
-func (mm *MonoZipSubscriber[I, O]) CurrentContext() {
+func (mm *MonoZipSubscriber[O]) CurrentContext() {
 
 }
