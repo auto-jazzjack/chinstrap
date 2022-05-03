@@ -25,4 +25,13 @@ func main() {
 		Block()
 	fmt.Println(v)
 
+	v1 := Mono.Zip2(
+		Mono.Just(1112),
+		Mono.Just(4124),
+		func(i1 int, i2 int) string {
+			return "1"
+		}).
+		Block()
+	fmt.Println(v1)
+
 }

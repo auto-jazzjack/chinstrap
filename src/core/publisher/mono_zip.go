@@ -15,13 +15,13 @@ func NewMonoZip2[I0 any, I1 any, O any](source1 Mono[I0], source2 Mono[I1], zipp
 	var v = []Mono0[any]{}
 
 	t1, ok1 := source1.actual.(Mono0[any])
-	if !ok1 {
+	if ok1 {
 		panic(ok1)
 	}
 	v = append(v, Mono0[any](t1))
 
 	t2, ok2 := source2.actual.(Mono0[any])
-	if !ok2 {
+	if ok2 {
 		panic(ok2)
 	}
 	v = append(v, t2)
