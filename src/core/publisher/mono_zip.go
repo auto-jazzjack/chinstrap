@@ -14,8 +14,17 @@ func NewMonoZip2[I0 any, I1 any, O any](source1 Mono[I0], source2 Mono[I1], zipp
 
 	var v = []Mono0[any]{}
 
-	v = append(v, Mono0[any](source1.actual.(Mono0[any])))
-	v = append(v, Mono0[any](source2.actual.(Mono0[any])))
+	t1, ok1 := source1.actual.(Mono0[any])
+	if !ok1 {
+		panic(ok1)
+	}
+	v = append(v, Mono0[any](t1))
+
+	t2, ok2 := source2.actual.(Mono0[any])
+	if !ok2 {
+		panic(ok2)
+	}
+	v = append(v, t2)
 
 	zip := &MonoZip[O]{
 		monos: v,
@@ -30,7 +39,7 @@ func NewMonoZip2[I0 any, I1 any, O any](source1 Mono[I0], source2 Mono[I1], zipp
 
 func (m *MonoZip[O]) SubscribeCore(actual core.CoreSubscriber[O]) {
 	for _, v := range m.monos {
-		v.Subscribe(newMonoZipSubscriber(actual, m))
+		v.Subscribe(newMonoZipSubscriber(actual.(core.CoreSubscriber[any]), m.signal))
 	}
 	//m.mono.actual.Subscribe()
 }
@@ -44,42 +53,42 @@ func (m *MonoZip[O]) Subscribe(s reactive.Subscriber[O]) {
 }
 
 type MonoZipSubscriber[O any] struct {
-	zipper    func(...any) O
-	src       core.CoreSubscriber[O] //parent
-	parentZip *MonoZip[O]
-	sub       reactive.Subscription
+	zipper   func(...any) O
+	src      core.CoreSubscriber[O] //parent
+	callback func()
+	sub      reactive.Subscription
 }
 
-func newMonoZipSubscriber(mm core.CoreSubscriber[any], mz *MonoZip[any]) reactive.Subscriber[any] {
+func newMonoZipSubscriber(mm core.CoreSubscriber[any], callback func()) reactive.Subscriber[any] {
 	return &MonoZipSubscriber[any]{
-		src:       mm,
-		parentZip: mz,
+		src:      mm,
+		callback: callback,
 	}
 }
 
-func (mm *MonoZipSubscriber[O]) OnSubscribe(s reactive.Subscription) {
+func (mm *MonoZipSubscriber[any]) OnSubscribe(s reactive.Subscription) {
 	mm.sub = s
 	mm.src.OnSubscribe(mm)
 }
-func (mm *MonoZipSubscriber[O]) OnError(t error) {
+func (mm *MonoZipSubscriber[any]) OnError(t error) {
 	mm.src.OnError(t)
 }
-func (mm *MonoZipSubscriber[O]) OnNext(t any) error {
-	mm.parentZip.signal()
+func (mm *MonoZipSubscriber[any]) OnNext(t any) error {
+	mm.callback()
 	return nil
 }
 
-func (mm *MonoZipSubscriber[O]) OnComplete() {
+func (mm *MonoZipSubscriber[any]) OnComplete() {
 	mm.src.OnComplete()
 }
 
-func (mm *MonoZipSubscriber[O]) Request(n int64) {
+func (mm *MonoZipSubscriber[any]) Request(n int64) {
 	mm.sub.Request(n)
 }
-func (mm *MonoZipSubscriber[O]) Cancel() {
+func (mm *MonoZipSubscriber[any]) Cancel() {
 	mm.sub.Cancel()
 }
 
-func (mm *MonoZipSubscriber[O]) CurrentContext() {
+func (mm *MonoZipSubscriber[any]) CurrentContext() {
 
 }
