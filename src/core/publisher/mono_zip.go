@@ -13,13 +13,14 @@ type MonoZip[O any] struct {
 func NewMonoZip2[I0 any, I1 any, O any](source1 Mono[I0], source2 Mono[I1], zipper func(I0, I1) O) Mono[O] {
 
 	var v = []Mono[any]{}
-	v = append(v, source1)
-	v = append(v, source2)
+
+	v = append(v, Mono[any](source1))
+	v = append(v, Mono[any](source2))
 
 	zip := &MonoZip[O]{
 		monos: v,
 		zipper: func(a ...any) O {
-			return zipper(a[0].(I), a[1].(I))
+			return zipper(a[0].(I0), a[1].(I1))
 		},
 	}
 	return Mono[O]{
