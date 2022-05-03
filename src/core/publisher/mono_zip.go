@@ -5,23 +5,37 @@ import (
 	"chinstrap/core/reactive"
 )
 
-type MonoZip[I any, O any] struct {
-	zipper func(...I) O
-	monos  []Mono[I]
+type MonoZip[O any] struct {
+	zipper func(...any) O
+	monos  []Mono[any]
 }
 
-func NewMonoZip[I any, O any](sources []Mono[I], zipper func(...I) O) Mono[O] {
-	v := &MonoZip[I, O]{
-		monos:  sources,
-		zipper: zipper,
+func NewMonoZip2[I0 any, I1 any, O any](source1 Mono[I0], source2 Mono[I1], zipper func(I0, I1) O) Mono[O] {
+
+	var v = []Mono[any]{}
+	v = append(v, source1)
+	v = append(v, source2)
+
+	zip := &MonoZip[O]{
+		monos: v,
+		zipper: func(a ...any) O {
+			return zipper(a[0].(I), a[1].(I))
+		},
 	}
 	return Mono[O]{
-		actual: v,
+		actual: zip,
 	}
 }
 
 func (m *MonoZip[I, O]) SubscribeCore(actual core.CoreSubscriber[O]) {
-	m.mono.actual.Subscribe(newMonoZipSubscriber(actual, m.Zipper))
+	for _, v := range m.monos {
+		v.actual.Subscribe(newMonoZipSubscriber(actual, m, m.zipper))
+	}
+	//m.mono.actual.Subscribe()
+}
+
+func (m *MonoZip[I, O]) signal() {
+
 }
 
 func (m *MonoZip[I, O]) Subscribe(s reactive.Subscriber[O]) {
@@ -29,15 +43,17 @@ func (m *MonoZip[I, O]) Subscribe(s reactive.Subscriber[O]) {
 }
 
 type MonoZipSubscriber[I any, O any] struct {
-	Zipper func(I) O
-	src    core.CoreSubscriber[O] //parent
-	sub    reactive.Subscription
+	zipper    func(...any) O
+	src       core.CoreSubscriber[O] //parent
+	parentZip *MonoZip[I, O]
+	sub       reactive.Subscription
 }
 
-func newMonoZipSubscriber[I any, O any](m core.CoreSubscriber[O], Zipper func(I) O) reactive.Subscriber[I] {
+func newMonoZipSubscriber[I any, O any](mm core.CoreSubscriber[O], mz *MonoZip[I, O], zipper func(...any) O) reactive.Subscriber[I] {
 	return &MonoZipSubscriber[I, O]{
-		Zipper: Zipper,
-		src:    m,
+		zipper:    zipper,
+		src:       mm,
+		parentZip: mz,
 	}
 }
 
@@ -49,12 +65,12 @@ func (mm *MonoZipSubscriber[I, O]) OnError(t error) {
 	mm.src.OnError(t)
 }
 func (mm *MonoZipSubscriber[I, O]) OnNext(t I) error {
-	res := mm.Zipper(t)
-	return mm.src.OnNext(res)
+	return mm.src.OnNext(t)
 }
 
 func (mm *MonoZipSubscriber[I, O]) OnComplete() {
 	mm.src.OnComplete()
+	mm.parentZip.signal()
 }
 
 func (mm *MonoZipSubscriber[I, O]) Request(n int64) {

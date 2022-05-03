@@ -34,8 +34,8 @@ func (m Mono[T]) Filter(predicate func(T) bool) Mono[T] {
 	return NewMonoFilter(m, predicate)
 }
 
-func (m Mono[T]) Zip2(sources []Mono[T], zipper func(...T) T) Mono[T] {
-	return NewMonoZip(sources, zipper)
+func (m Mono[T]) Zip2(source1 Mono[T], source2 Mono[T], zipper func(T, T) T) Mono[T] {
+	return NewMonoZip2(source1, source2, zipper)
 }
 
 func (m Mono[T]) Subscribe0() {
