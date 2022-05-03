@@ -34,6 +34,10 @@ func (m Mono[T]) Filter(predicate func(T) bool) Mono[T] {
 	return NewMonoFilter(m, predicate)
 }
 
+func (m Mono[T]) Zip2(sources []Mono[T], zipper func(...T) T) Mono[T] {
+	return NewMonoZip(sources, zipper)
+}
+
 func (m Mono[T]) Subscribe0() {
 	m.actual.Subscribe(NewLamdaSubscriber[T](nil, nil, nil))
 }
