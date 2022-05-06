@@ -4,7 +4,6 @@ import (
 	"chinstrap/core"
 	"chinstrap/core/reactive"
 	"chinstrap/core/util"
-	"fmt"
 )
 
 type Mono[T util.All] struct {
@@ -59,16 +58,21 @@ func Subscribe0[T util.All](m core.CorePublisher[T], s reactive.Subscriber[T]) {
 	pub.SubscribeCore(sub)
 }
 
-func convert(input []util.All) []core.CorePublisher[util.All] {
+/* func convert(input []util.All) []core.CorePublisher[util.All] {
 
 	var retv []core.CorePublisher[util.All]
 
 	for _, v := range input {
-		_, ok := v.(Mono0[util.All])
+		_, ok := v.(Mono0[int])
 		fmt.Print(ok)
 
+		a, _ := v.(Mono0[int])
+		b := Mono0[util.All](a)
+
+		fmt.Print(b)
 		retv = append(retv, v.(Mono0[util.All]))
 
 	}
 	return retv
 }
+*/

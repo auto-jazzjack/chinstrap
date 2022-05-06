@@ -13,13 +13,13 @@ type MonoZip[O util.All] struct {
 
 func NewMonoZip2[I0 any, I1 util.All, O util.All](source1 Mono[I0], source2 Mono[I1], zipper func(I0, I1) O) Mono[O] {
 
-	var v []util.All
+	var v []core.CorePublisher[util.All]
 
-	v = append(v, source1.actual)
-	v = append(v, source2.actual)
+	v = append(v, ConvertToObject(source1))
+	v = append(v, ConvertToObject(source2))
 
 	zip := &MonoZip[O]{
-		monos: convert(v),
+		monos: v,
 		zipper: func(a ...util.All) O {
 			return zipper(a[0].(I0), a[1].(I1))
 		},
@@ -30,9 +30,9 @@ func NewMonoZip2[I0 any, I1 util.All, O util.All](source1 Mono[I0], source2 Mono
 }
 
 func (m *MonoZip[O]) SubscribeCore(actual core.CoreSubscriber[O]) {
-	//for _, v := range m.monos {
-	//	v.Subscribe(newMonoZipSubscriber(actual.(core.CoreSubscriber[any]), m.signal))
-	//}
+	for _, v := range m.monos {
+		v.Subscribe(newMonoZipSubscriber(actual.(core.CoreSubscriber[util.All]), m.signal))
+	}
 	//m.mono.actual.Subscribe()
 }
 
