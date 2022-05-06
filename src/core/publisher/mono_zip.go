@@ -4,7 +4,6 @@ import (
 	"chinstrap/core"
 	"chinstrap/core/reactive"
 	"chinstrap/core/util"
-	"fmt"
 )
 
 type MonoZip[O util.All] struct {
@@ -28,17 +27,6 @@ func NewMonoZip2[I0 any, I1 util.All, O util.All](source1 Mono[I0], source2 Mono
 	return Mono[O]{
 		actual: zip,
 	}
-}
-
-func convert(input []util.All) []core.CorePublisher[util.All] {
-
-	var retv []core.CorePublisher[util.All]
-	for _, v := range input {
-		_, ok := v.(Mono0[util.All])
-		fmt.Print(ok)
-		retv = append(retv, v.(Mono0[util.All]))
-	}
-	return retv
 }
 
 func (m *MonoZip[O]) SubscribeCore(actual core.CoreSubscriber[O]) {
