@@ -3,32 +3,25 @@ package publisher
 import (
 	"chinstrap/core"
 	"chinstrap/core/reactive"
+	"chinstrap/core/util"
+	"fmt"
 )
 
-type MonoZip[O any] struct {
-	zipper func(...any) O
-	monos  []Mono0[any]
+type MonoZip[O util.All] struct {
+	zipper func(...util.All) O
+	monos  []core.CorePublisher[util.All]
 }
 
-func NewMonoZip2[I0 any, I1 any, O any](source1 Mono[I0], source2 Mono[I1], zipper func(I0, I1) O) Mono[O] {
+func NewMonoZip2[I0 any, I1 util.All, O util.All](source1 Mono[I0], source2 Mono[I1], zipper func(I0, I1) O) Mono[O] {
 
-	var v = []Mono0[any]{}
+	var v []util.All
 
-	t1, ok1 := source1.actual.(Mono0[any])
-	if ok1 {
-		panic(ok1)
-	}
-	v = append(v, Mono0[any](t1))
-
-	t2, ok2 := source2.actual.(Mono0[any])
-	if ok2 {
-		panic(ok2)
-	}
-	v = append(v, t2)
+	v = append(v, source1.actual)
+	v = append(v, source2.actual)
 
 	zip := &MonoZip[O]{
-		monos: v,
-		zipper: func(a ...any) O {
+		monos: convert(v),
+		zipper: func(a ...util.All) O {
 			return zipper(a[0].(I0), a[1].(I1))
 		},
 	}
@@ -37,10 +30,21 @@ func NewMonoZip2[I0 any, I1 any, O any](source1 Mono[I0], source2 Mono[I1], zipp
 	}
 }
 
-func (m *MonoZip[O]) SubscribeCore(actual core.CoreSubscriber[O]) {
-	for _, v := range m.monos {
-		v.Subscribe(newMonoZipSubscriber(actual.(core.CoreSubscriber[any]), m.signal))
+func convert(input []util.All) []core.CorePublisher[util.All] {
+
+	var retv []core.CorePublisher[util.All]
+	for _, v := range input {
+		_, ok := v.(Mono0[util.All])
+		fmt.Print(ok)
+		retv = append(retv, v.(Mono0[util.All]))
 	}
+	return retv
+}
+
+func (m *MonoZip[O]) SubscribeCore(actual core.CoreSubscriber[O]) {
+	//for _, v := range m.monos {
+	//	v.Subscribe(newMonoZipSubscriber(actual.(core.CoreSubscriber[any]), m.signal))
+	//}
 	//m.mono.actual.Subscribe()
 }
 
@@ -52,15 +56,15 @@ func (m *MonoZip[O]) Subscribe(s reactive.Subscriber[O]) {
 	Subscribe0(core.CorePublisher[O](m), s)
 }
 
-type MonoZipSubscriber[O any] struct {
-	zipper   func(...any) O
+type MonoZipSubscriber[O util.All] struct {
+	zipper   func(...util.All) O
 	src      core.CoreSubscriber[O] //parent
 	callback func()
 	sub      reactive.Subscription
 }
 
-func newMonoZipSubscriber(mm core.CoreSubscriber[any], callback func()) reactive.Subscriber[any] {
-	return &MonoZipSubscriber[any]{
+func newMonoZipSubscriber(mm core.CoreSubscriber[util.All], callback func()) reactive.Subscriber[util.All] {
+	return &MonoZipSubscriber[util.All]{
 		src:      mm,
 		callback: callback,
 	}

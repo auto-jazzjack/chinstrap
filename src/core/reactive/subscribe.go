@@ -1,6 +1,8 @@
 package reactive
 
-type Subscriber[T any] interface {
+import "chinstrap/core/util"
+
+type Subscriber[T util.All] interface {
 	OnSubscribe(s Subscription)
 	OnNext(t T) error
 	OnError(t error)

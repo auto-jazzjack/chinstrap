@@ -2,18 +2,19 @@ package publisher
 
 import (
 	"chinstrap/core/reactive"
+	"chinstrap/core/util"
 	"math"
 	"sync"
 )
 
-type BlockingMonoSubscriberImpl[T any] struct {
+type BlockingMonoSubscriberImpl[T util.All] struct {
 	wg    sync.WaitGroup
 	err   error
 	value T
 	sub   reactive.Subscription
 }
 
-func NewBlockingMonoSubscriber[T any]() *BlockingMonoSubscriberImpl[T] {
+func NewBlockingMonoSubscriber[T util.All]() *BlockingMonoSubscriberImpl[T] {
 	_wg := sync.WaitGroup{}
 	_wg.Add(1)
 	return &BlockingMonoSubscriberImpl[T]{

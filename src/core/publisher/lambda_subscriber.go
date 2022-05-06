@@ -3,10 +3,11 @@ package publisher
 import (
 	"chinstrap/core"
 	"chinstrap/core/reactive"
+	"chinstrap/core/util"
 	"math"
 )
 
-type LamdaImpl[T any] struct {
+type LamdaImpl[T util.All] struct {
 	consumer         func(T) error
 	errorConsumer    func(error)
 	completeConsumer func()
@@ -14,7 +15,7 @@ type LamdaImpl[T any] struct {
 	sub reactive.Subscription
 }
 
-func NewLamdaSubscriber[T any](consumer func(T) error, errorConsumer func(error), completeConsumer func()) core.CoreSubscriber[T] {
+func NewLamdaSubscriber[T util.All](consumer func(T) error, errorConsumer func(error), completeConsumer func()) core.CoreSubscriber[T] {
 	return &LamdaImpl[T]{
 		consumer:         consumer,
 		completeConsumer: completeConsumer,

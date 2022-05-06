@@ -3,14 +3,15 @@ package publisher
 import (
 	"chinstrap/core"
 	"chinstrap/core/reactive"
+	"chinstrap/core/util"
 )
 
-type MonoFilter[I any] struct {
+type MonoFilter[I util.All] struct {
 	predicate func(I) bool
 	mono      Mono[I]
 }
 
-func NewMonoFilter[I any](source Mono[I], predicate func(I) bool) Mono[I] {
+func NewMonoFilter[I util.All](source Mono[I], predicate func(I) bool) Mono[I] {
 	v := &MonoFilter[I]{
 		mono:      source,
 		predicate: predicate,
@@ -20,21 +21,21 @@ func NewMonoFilter[I any](source Mono[I], predicate func(I) bool) Mono[I] {
 	}
 }
 
-func (m *MonoFilter[I]) SubscribeCore(actual core.CoreSubscriber[I]) {
+func (m MonoFilter[I]) SubscribeCore(actual core.CoreSubscriber[I]) {
 	m.mono.actual.Subscribe(newMonoFilterSubscriber(actual, m.predicate))
 }
 
-func (m *MonoFilter[I]) Subscribe(s reactive.Subscriber[I]) {
+func (m MonoFilter[I]) Subscribe(s reactive.Subscriber[I]) {
 	Subscribe0(core.CorePublisher[I](m), s)
 }
 
-type MonoFilterSubscriber[I any] struct {
+type MonoFilterSubscriber[I util.All] struct {
 	predicate func(I) bool
 	src       core.CoreSubscriber[I]
 	sub       reactive.Subscription
 }
 
-func newMonoFilterSubscriber[I any](m core.CoreSubscriber[I], predicate func(I) bool) reactive.Subscriber[I] {
+func newMonoFilterSubscriber[I util.All](m core.CoreSubscriber[I], predicate func(I) bool) reactive.Subscriber[I] {
 	return &MonoFilterSubscriber[I]{
 		predicate: predicate,
 		src:       m,

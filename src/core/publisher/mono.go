@@ -3,18 +3,19 @@ package publisher
 import (
 	"chinstrap/core"
 	"chinstrap/core/reactive"
+	"chinstrap/core/util"
 )
 
-type Mono[T any] struct {
+type Mono[T util.All] struct {
 	actual Mono0[T]
 	//Map() Mono[any]
 }
 
-type Mono0[T any] interface {
+type Mono0[T util.All] interface {
 	core.CorePublisher[T]
 }
 
-func Just[V any](v V) Mono[V] {
+func Just[V util.All](v V) Mono[V] {
 	return NewMonoJust(v)
 
 }
@@ -34,7 +35,7 @@ func (m Mono[T]) Filter(predicate func(T) bool) Mono[T] {
 	return NewMonoFilter(m, predicate)
 }
 
-func Zip2[I0 any, I1 any, O any](source1 Mono[I0], source2 Mono[I1], zipper func(I0, I1) O) Mono[O] {
+func Zip2[I0 util.All, I1 util.All, O util.All](source1 Mono[I0], source2 Mono[I1], zipper func(I0, I1) O) Mono[O] {
 	return NewMonoZip2(source1, source2, zipper)
 }
 
@@ -51,7 +52,7 @@ func (m Mono[T]) SubscribeCore(sub core.CoreSubscriber[T]) {
 	panic("should not reached")
 }
 
-func Subscribe0[T any](m core.CorePublisher[T], s reactive.Subscriber[T]) {
+func Subscribe0[T util.All](m core.CorePublisher[T], s reactive.Subscriber[T]) {
 	pub := core.CorePublisher[T](m)
 	sub := s.(core.CoreSubscriber[T])
 	pub.SubscribeCore(sub)

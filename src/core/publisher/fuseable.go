@@ -16,16 +16,16 @@ const ANY = 3
 type Fusable interface {
 }
 
-type ScalarCallable[T any] interface {
+type ScalarCallable[T util.All] interface {
 	util.Callable[T]
 }
 
-type QueueSubscription[T any] interface {
+type QueueSubscription[T util.All] interface {
 	reactive.Subscription
 	RequestFusion(mode int) int
 }
 
-type SynchronousSubscription[T any] interface {
+type SynchronousSubscription[T util.All] interface {
 	/*@Override
 	default int requestFusion(int requestedMode) {
 		if ((requestedMode & Fuseable.SYNC) != 0) {
