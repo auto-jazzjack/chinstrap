@@ -4,22 +4,31 @@ import (
 	"chinstrap/core"
 	"chinstrap/core/reactive"
 	"chinstrap/core/util"
+	"fmt"
+	"reflect"
 )
 
 type MonoZip[O util.All] struct {
-	zipper func(...util.All) O
-	monos  []core.CorePublisher[util.All]
+	zipper        func(...util.All) O
+	monos         []core.CorePublisher[util.All]
+	reflectMonos  []any
+	reflectMonost []reflect.Type
 }
 
-func NewMonoZip2[I0 any, I1 util.All, O util.All](source1 Mono[I0], source2 Mono[I1], zipper func(I0, I1) O) Mono[O] {
+func NewMonoZip2[I0 util.All, I1 util.All, O util.All](source1 Mono[I0], source2 Mono[I1], zipper func(I0, I1) O) Mono[O] {
 
-	var v []core.CorePublisher[util.All]
+	var v []any
+	var t []reflect.Type
 
-	v = append(v, ConvertToObject(source1))
-	v = append(v, ConvertToObject(source2))
+	v = append(v, reflect.ValueOf(source1).Interface())
+	v = append(v, reflect.ValueOf(source2).Interface())
+
+	t = append(t, reflect.TypeOf(source1))
+	t = append(t, reflect.TypeOf(source2))
 
 	zip := &MonoZip[O]{
-		monos: v,
+		reflectMonos:  v,
+		reflectMonost: t,
 		zipper: func(a ...util.All) O {
 			return zipper(a[0].(I0), a[1].(I1))
 		},
@@ -30,8 +39,13 @@ func NewMonoZip2[I0 any, I1 util.All, O util.All](source1 Mono[I0], source2 Mono
 }
 
 func (m *MonoZip[O]) SubscribeCore(actual core.CoreSubscriber[O]) {
-	for _, v := range m.monos {
-		v.Subscribe(newMonoZipSubscriber(actual.(core.CoreSubscriber[util.All]), m.signal))
+	for i := 0; i < len(m.reflectMonos); i++ {
+		asd := m.reflectMonos[i]
+		fmt.Print(m.reflectMonost[i])
+		fmt.Print(asd)
+		//asd := core.CorePublisher[util.All](v.Call())
+		//fmt.Print(asd)
+		//v.Subscribe(newMonoZipSubscriber(NewCoreSubscriber[O](actual), m.signal))
 	}
 	//m.mono.actual.Subscribe()
 }
